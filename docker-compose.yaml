@@ -1,0 +1,36 @@
+services:
+  spotdl:
+    build: .                                   # Dockerfile updates yt-dlp on top of spotdl/spotify-downloader:latest
+    image: spotdl-local:latest
+    container_name: spotdl
+    command:
+      - web
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8800"
+      - --client-id
+      - "${SPOTIFY_CLIENT_ID}"                 # your own Spotify app credentials (from .env)
+      - --client-secret
+      - "${SPOTIFY_CLIENT_SECRET}"
+      - --web-use-output-dir
+      - --output
+      - "/music/{list-name}/{artists} - {title}.{output-ext}"   # each playlist/album in its own folder
+    environment:
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}   # set these in .env (see .env.example)
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - HOME=/config
+    # On Windows / macOS Docker Desktop this is handled automatically; the
+    # default 1000:1000 is fine. If you hit permission errors writing to
+    # ./music on Windows, comment this line out so the container runs as root.
+    user: "${PUID:-1000}:${PGID:-1000}"
+    ports:
+      - "127.0.0.1:8800:8800"                  # localhost only — this is a personal PC, not a LAN server
+    volumes:
+      - ./music:/music                         # your downloads land here; open it in Explorer/Finder
+      - ./config:/config
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

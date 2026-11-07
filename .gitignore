@@ -1,0 +1,12 @@
+# Secrets — never commit real credentials
+.env
+
+# Downloaded music (large, often copyrighted) and runtime config/cache —
+# ignore the contents but keep the empty folders in the repo.
+music/*
+config/*
+!music/.gitkeep
+!config/.gitkeep
+
+# macOS
+.DS_Store
